@@ -20,7 +20,7 @@ google-auth==1.32.0
 google-auth-oauthlib==0.4.4
 greenlet==1.1.0
 gspread==3.7.0
-gunicorn
+gunicorn==20.1.0
 httplib2==0.19.1
 humanize==3.7.1
 idna==2.10
