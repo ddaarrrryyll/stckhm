@@ -6,6 +6,7 @@ StckHm uses a combination of graphs and charts to help you visualise your portfo
 With that said, I have decided to not live host this webapp because I feel that I do not have any rights to see what your holdings are since some may consider it as 'private'. Instead, I will be providing a guide on how to run this webapp on your pc (hopefully it's not hard HAHA)\
 
 ## Before Doing anything
+### Clone this Repository
 ### Install requirements
 Do `pip install requirements.txt` in your python terminal/console
 ### Getting the API keys
