@@ -1,4 +1,4 @@
-import keys
+import os
 import nest_asyncio
 import sqlite3
 import requests
@@ -14,14 +14,14 @@ from flask_session import Session
 from tempfile import mkdtemp
 
 # USD to SGD conversion rate
-# er_token = os.getenv("exchange_rate_token") # From https://app.exchangerate-api.com/
-er_token = keys.exchangeRate_token
+er_token = os.getenv("exchange_rate_token") # From https://app.exchangerate-api.com/
+# er_token = keys.exchangeRate_token
 temp = requests.get(f"https://v6.exchangerate-api.com/v6/{er_token}/latest/USD")
 res = temp.json()
 conv_rate = float(res['conversion_rates']['SGD'])
 
-# token = os.getenv("finnhub_api_key") # From https://finnhub.io/
-token = keys.finnhub_token
+token = os.getenv("finnhub_api_key") # From https://finnhub.io/
+# token = keys.finnhub_token
 
 user_id = "demo" # Choose how you want the database to identify you // I don't think you need to have more than one user
 
@@ -48,7 +48,8 @@ def after_request(response):
     return response
 
 # configure database
-conn = sqlite3.connect('main.db', timeout=5.0, check_same_thread=False)
+db = os.getenv("DATABASE_URL")
+conn = sqlite3.connect(db, timeout=5.0, check_same_thread=False)
 c = conn.cursor()
 conn.row_factory = sqlite3.Row
 
