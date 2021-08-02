@@ -10,6 +10,7 @@ import json
 import datetime
 import time
 import keys
+from cs50 import SQL
 from collections import defaultdict
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, g
 from flask_session import Session
@@ -49,11 +50,10 @@ def after_request(response):
 
 
 # configure database
-conn = sqlite3.connect('main.db', timeout=5.0, check_same_thread=False)
+conn = sqlite3.connect(os.getenv("DATABASE_URL"), timeout=5.0, check_same_thread=False)
 c = conn.cursor()
 conn.row_factory = sqlite3.Row
 
-# db = SQL(secrets.dblink)
 
 ###################################HELPER FUNCTIONS####################################################
 nest_asyncio.apply()
