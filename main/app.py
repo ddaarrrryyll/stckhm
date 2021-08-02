@@ -9,20 +9,19 @@ import investpy
 import json
 import datetime
 import time
-import keys
-from cs50 import SQL
+
 from collections import defaultdict
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, g
 from flask_session import Session
 from tempfile import mkdtemp
 
 # USD to SGD conversion rate
-er_token = keys.exchangeRate_token
+er_token = os.getenv("exchange_rate_token") # From https://app.exchangerate-api.com/
 temp = requests.get(f"https://v6.exchangerate-api.com/v6/{er_token}/latest/USD")
 res = temp.json()
 conv_rate = float(res['conversion_rates']['SGD'])
 
-token = keys.finnhub_token # Finnhub API key
+token = os.getenv("finnhub_api_key") # From https://finnhub.io/
 
 user_id = "demo" # Choose how you want the database to identify you // I don't think you need to have more than one user
 
