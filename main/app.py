@@ -49,8 +49,9 @@ def after_request(response):
 
 
 # configure database
-c = SQL("sqlite:///main.db")
-conn = SQL("sqlite:///main.db")
+conn = sqlite3.connect('main.db', timeout=5.0, check_same_thread=False)
+c = conn.cursor()
+conn.row_factory = sqlite3.Row
 
 
 ###################################HELPER FUNCTIONS####################################################
