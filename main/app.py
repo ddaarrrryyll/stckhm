@@ -49,8 +49,9 @@ def after_request(response):
 
 
 # configure database
-c = SQL("postgresql://lhswdngfsvcyjb:0d4fc9751b9c374d801ac27cfdcfc4b77b460c4611b3fb3e72cbd0889512f0f1@ec2-44-194-54-123.compute-1.amazonaws.com:5432/d5ivb8fabqtg1g", check_same_thread = False)
-conn = SQL(os.getenv("DATABASE_URL"))
+c = SQL("postgresql://lhswdngfsvcyjb:0d4fc9751b9c374d801ac27cfdcfc4b77b460c4611b3fb3e72cbd0889512f0f1@ec2-44-194-54-123.compute-1.amazonaws.com:5432/d5ivb8fabqtg1g")
+conn = SQL("postgresql://lhswdngfsvcyjb:0d4fc9751b9c374d801ac27cfdcfc4b77b460c4611b3fb3e72cbd0889512f0f1@ec2-44-194-54-123.compute-1.amazonaws.com:5432/d5ivb8fabqtg1g")
+
 
 ###################################HELPER FUNCTIONS####################################################
 nest_asyncio.apply()
