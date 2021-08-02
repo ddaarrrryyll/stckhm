@@ -48,10 +48,7 @@ def after_request(response):
     return response
 
 # configure database
-temp = os.getenv("DATABASE_URL")
-db = "postgresql"+temp[8:]
-print(db)
-conn = sqlite3.connect(db, timeout=5.0, check_same_thread=False)
+conn = sqlite3.connect("../main/main.db", timeout=5.0, check_same_thread=False)
 c = conn.cursor()
 conn.row_factory = sqlite3.Row
 
