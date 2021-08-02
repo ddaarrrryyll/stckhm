@@ -49,10 +49,8 @@ def after_request(response):
 
 
 # configure database
-conn = sqlite3.connect("main.db", timeout=5.0, check_same_thread=False)
-c = conn.cursor()
-conn.row_factory = sqlite3.Row
-
+c = SQL(os.getenv("DATABASE_URL"), check_same_thread = False)
+conn = SQL(os.getenv("DATABASE_URL"))
 
 ###################################HELPER FUNCTIONS####################################################
 nest_asyncio.apply()
