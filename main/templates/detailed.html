@@ -1,0 +1,238 @@
+{% extends "sidebar.html" %}
+
+{% block title %}
+    detailed view
+{% endblock %}
+
+{% block main %}
+<link rel="stylesheet" type="text/css" href="../static/styles/main.css">
+<!-- HEADER COLUMNS FOR ACCOUNT VALUE, CASH, DAY CHANGE -->
+<!-- CHANGE THE VALUES OMG FK -->
+    <div class="row" style="align-content: center">
+        <div class="column4">
+            <div class="card">
+                <h6>Total Value</h6>
+<!--                yesterday's portfolio + daily returns -->
+                <p style="font-weight: bold">{{ '%0.2f' | format(equity_val+cash) }} USD ≈ {{ '%0.2f' | format((equity_val+cash) * conv_rate)}} SGD</p>
+            </div>
+        </div>
+        <div class="column4">
+            <div class="card">
+                <h6>Capital</h6>
+                <p style="font-weight: bold">{{ '%0.2f' | format(capital) }} USD ≈ {{ '%0.2f' | format(capital * conv_rate) }} SGD</p>
+            </div>
+        </div>
+        <div class="column4">
+            <div class="card">
+                <h6>Earnings</h6>
+                {% if earnings < 0 %}
+                    <p style="font-weight: bold; color: #BB0000">{{ '%0.2f' | format(earnings) }} USD ≈ {{ '%0.2f' | format(earnings * conv_rate) }} SGD</p>
+                {% else %}
+                    <p style="font-weight: bold; color: #00BB00">{{ '%0.2f' | format(earnings) }} USD ≈ {{ '%0.2f' | format(earnings * conv_rate) }} SGD</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="column4">
+            <div class="card">
+                <h6>% Returns</h6>
+                {% if capital == 0 %}
+                    <p style="font-weight: bold; color: #000000">0.00</p>
+                {% else %}
+                    {% if earnings < 0 %}
+                        <p style="font-weight: bold; color: #BB0000">{{ '%0.2f' | format(earnings/capital * 100) }}</p>
+                    {% else %}
+                        <p style="font-weight: bold; color: #00BB00">{{ '%0.2f' | format(earnings/capital * 100) }}</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+<!-- CURRENT HOLDINGS -->
+    <div class="holdings">
+        <div class="card">
+            <h6>Current Positions</h6>
+            <div class="card_pad"></div>
+            <div class="card_bord"></div>
+            <div class="card_pad"></div>
+            <table>
+                <!-- FOR US STOCKS -->
+                {% if holdings_us %}
+                <tr>
+                    <th>Instrument (US)</th>
+                    <th>Ticker</th>
+                    <th>Sector</th>
+                    <th>Date Opened</th>
+                    <th>QTY</th>
+                    <th>Open (USD)</th>
+                    <th>Current Price (USD)</th>
+                    <th>Day Change</th>
+                    <th>% Change</th>
+                    <th>P/L (USD)</th>
+                    <th>Market Value (USD)</th>
+                </tr>
+                <!-- for each stock in stocks create a new line then we have to insert border after every one-->
+                {% for stock in holdings_us %}
+                <tr>
+                    <td>{{ stock[0] }}</td>
+                    <td>{{ stock[1] }}</td>
+                    <td>{{ stock[2] }}</td>
+                    <td>{{ stock[3] }}</td>
+                    <td>{{ stock[4] }}</td>
+                    <td>{{ stock[5] }}</td>
+                    {% if stock[7] == -1 %}
+                        <td>{{ stock[6] }} (Prev. Close)</td>
+                    {% else %}
+                        <td>{{ stock[6] }}</td>
+                    {% endif %}
+                    <!-- DAY CHANGE -->
+                    {% if stock[7] == -1 %}
+                        <td>--</td>
+                    {% else %}
+                        {% if stock[7] < 0 %}
+                            <td class="down">{{ stock[7] }} ({{ stock[8] }}%)</td>
+                        {% else %}
+                            <td class="up">{{ stock[7] }} ({{ stock[8] }}%)</td>
+                        {% endif %}
+                    {% endif %}
+                    <!-- % CHANGE -->
+                    {% if stock[9] < 0 %}
+                        <td class="down">{{ stock[9] }}%</td>
+                    {% else %}
+                        <td class="up">{{ stock[9] }}%</td>
+                    {% endif %}
+                    <!-- PROFIT / LOSS -->
+                    {% if stock[10] < 0 %}
+                        <td class="down">{{ stock[10] }}</td>
+                    {% else %}
+                        <td class="up">{{ stock[10] }}</td>
+                    {% endif %}
+                    <td class="stock">{{ stock[11] }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+                <!-- FOR SG STOCKS -->
+                {% if holdings_sg %}
+                <tr>
+                    <th>Instrument (SG)</th>
+                    <th>Ticker</th>
+                    <th>Sector</th>
+                    <th>Date Opened</th>
+                    <th>QTY</th>
+                    <th>Open (SGD)</th>
+                    <th>Previous Close (SGD)</th>
+                    <th>% Day Change</th>
+                    <th>% Change</th>
+                    <th>P/L (SGD)</th>
+                    <th>Market Value (SGD)</th>
+                </tr>
+                <!-- for each stock in stocks create a new line then we have to insert border after every one-->
+                {% for stock in holdings_sg %}
+                <tr>
+                    <td>{{ stock[0] }}</td>
+                    <td>{{ stock[1] }}</td>
+                    <td>{{ stock[2] }}</td>
+                    <td>{{ stock[3] }}</td>
+                    <td>{{ stock[4] }}</td>
+                    <td>{{ stock[5] }}</td>
+                    <td>{{ stock[6] }}</td>
+                    <!-- DAY CHANGE -->
+                    <td> -- </td>
+                    <!-- % CHANGE -->
+                    {% if stock[7] < 0 %}
+                        <td class="down">{{ stock[7] }}%</td>
+                    {% else %}
+                        <td class="up">{{ stock[7] }}%</td>
+                    {% endif %}
+                    <!-- PROFIT / LOSS -->
+                    {% if stock[8] < 0 %}
+                        <td class="down">{{ stock[8] }}</td>
+                    {% else %}
+                        <td class="up">{{ stock[8] }}</td>
+                    {% endif %}
+                    <td class="stock">{{ stock[9] }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+    </div>
+<!-- SOLD POSITIONS -->
+    <div class = holdings>
+        <div class="card">
+            <h6>Sold Positions</h6>
+            <div class="card_pad"></div>
+            <div class="card_bord"></div>
+            <div class="card_pad"></div>
+            <table>
+                <!-- FOR US STOCKS -->
+                {% if sold_usd %}
+                    <tr>
+                        <th>Instrument (US)</th>
+                        <th>Ticker</th>
+                        <th>Sector</th>
+                        <th>Date Opened</th>
+                        <th>QTY</th>
+                        <th>Open (USD)</th>
+                        <th>Price Sold (USD)</th>
+                        <th>% Change</th>
+                        <th>P/L (USD)</th>
+                        <th>Returns (USD)</th>
+                    </tr>
+                    {% for pos in sold_usd %}
+                    <tr>
+                        <td>{{ pos[0] }}</td>
+                        <td>{{ pos[1] }}</td>
+                        <td>{{ pos[2] }}</td>
+                        <td>{{ pos[3] }}</td>
+                        <td>{{ pos[4] }}</td>
+                        <td>{{ pos[5] }}</td>
+                        <td>{{ pos[7] }}</td>
+                        {% if pos[7]-pos[5] < 0 %}
+                            <td class="down">{{ '%0.2f' | format((pos[7]-pos[5])*100/pos[5]) }}</td>
+                            <td class="down">{{ '%0.2f' | format((pos[7]-pos[5])*pos[4]) }}</td>
+                        {% else %}
+                            <td class="up">{{ '%0.2f' | format((pos[7]-pos[5])*100/pos[5]) }}</td>
+                            <td class="up">{{ '%0.2f' | format((pos[7]-pos[5])*pos[4]) }}</td>
+                        {% endif %}
+                        <td>{{ '%0.2f' | format(pos[7]*pos[4]) }}</td>
+                    </tr>
+                {% endfor %}
+                {% endif %}
+                <!-- FOR SG STOCKS -->
+                {% if sold_sgd %}
+                    <tr>
+                        <th>Instrument (SG)</th>
+                        <th>Ticker</th>
+                        <th>Sector</th>
+                        <th>Date Opened</th>
+                        <th>QTY</th>
+                        <th>Open (SGD)</th>
+                        <th>Price Sold (SGD)</th>
+                        <th>% Change</th>
+                        <th>P/L (SGD)</th>
+                        <th>Returns (SGD)</th>
+                    </tr>
+                    {% for pos in sold_sgd %}
+                    <tr>
+                        <td>{{ pos[0] }}</td>
+                        <td>{{ pos[1] }}</td>
+                        <td>{{ pos[2] }}</td>
+                        <td>{{ pos[3] }}</td>
+                        <td>{{ pos[4] }}</td>
+                        <td>{{ pos[5] }}</td>
+                        <td>{{ pos[7] }}</td>
+                        {% if pos[7]-pos[5] < 0 %}
+                            <td class="down">{{ '%0.2f' | format((pos[7]-pos[5])*100/pos[5]) }}</td>
+                            <td class="down">{{ '%0.2f' | format((pos[7]-pos[5])*pos[4]) }}</td>
+                        {% else %}
+                            <td class="up">{{ '%0.2f' | format((pos[7]-pos[5])*100/pos[5]) }}</td>
+                            <td class="up">{{ '%0.2f' | format((pos[7]-pos[5])*pos[4]) }}</td>
+                        {% endif %}
+                        <td>{{ '%0.2f' | format(pos[7]*pos[4]) }}</td>
+                    </tr>
+                {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+    </div>
+{% endblock %}

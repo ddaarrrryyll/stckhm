@@ -1,0 +1,468 @@
+{% extends "sidebar.html" %}
+
+{% block title %}
+    Add Positions
+{% endblock %}
+
+{% block main %}
+<link rel="stylesheet" type="text/css" href="../static/styles/main.css">
+    <div style="text-align: center; opacity: 80%; margin-top: -20px">
+        <h5>READ ME:</h5>
+        <p>Try to add positions accurately to minimise changes so that all numerical values will be displayed accurately.</p>
+        <p>Dollar-Cost Averaging is done automatically so all you need to do is to add your new positions at whatever price you bought them at.</p>
+    </div>
+<!-- CURRENT HOLDINGS -->
+    <div class="holdings">
+        <div class="card">
+            <h6>Current Positions</h6>
+            <div class="card_pad"></div>
+            <div class="card_bord"></div>
+            <div class="card_pad"></div>
+            <table>
+                <!-- FOR US STOCKS -->
+                {% if holdings_us %}
+                <tr>
+                    <th>Instrument (US)</th>
+                    <th>Ticker</th>
+                    <th>Sector</th>
+                    <th>Date Opened</th>
+                    <th>QTY</th>
+                    <th>Open (USD)</th>
+                    <th>Current Price (USD)</th>
+                    <th>% Day Change</th>
+                    <th>% Change</th>
+                    <th>P/L (USD)</th>
+                    <th>Market Value (USD)</th>
+                </tr>
+                <!-- for each stock in stocks create a new line then we have to insert border after every one-->
+                {% for stock in holdings_us %}
+                <tr>
+                    <td>{{ stock[0] }}</td>
+                    <td>{{ stock[1] }}</td>
+                    <td>{{ stock[2] }}</td>
+                    <td>{{ stock[3] }}</td>
+                    <td>{{ stock[4] }}</td>
+                    <td>{{ stock[5] }}</td>
+                    {% if stock[7] == -1 %}
+                        <td>{{ stock[6] }} (Prev. Close)</td>
+                    {% else %}
+                        <td>{{ stock[6] }}</td>
+                    {% endif %}
+                    <!-- DAY CHANGE -->
+                    {% if stock[7] == -1 %}
+                        <td>--</td>
+                    {% else %}
+                        {% if stock[7] < 0 %}
+                            <td class="down">{{ stock[7] }} ({{ stock[8] }})%</td>
+                        {% else %}
+                            <td class="up">{{ stock[7] }} ({{ stock[8] }})%</td>
+                        {% endif %}
+                    {% endif %}
+                    <!-- % CHANGE -->
+                    {% if stock[9] < 0 %}
+                        <td class="down">{{ stock[9] }}%</td>
+                    {% else %}
+                        <td class="up">{{ stock[9] }}%</td>
+                    {% endif %}
+                    <!-- PROFIT / LOSS -->
+                    {% if stock[10] < 0 %}
+                        <td class="down">{{ stock[10] }}</td>
+                    {% else %}
+                        <td class="up">{{ stock[10] }}</td>
+                    {% endif %}
+                    <td class="stock">{{ stock[11] }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+                <!-- FOR SG STOCKS -->
+                {% if holdings_sg %}
+                <tr>
+                    <th>Instrument (SG)</th>
+                    <th>Ticker</th>
+                    <th>Sector</th>
+                    <th>Date Opened</th>
+                    <th>QTY</th>
+                    <th>Open (SGD)</th>
+                    <th>Previous Close (SGD)</th>
+                    <th>% Day Change</th>
+                    <th>% Change</th>
+                    <th>P/L (SGD)</th>
+                    <th>Market Value (SGD)</th>
+                </tr>
+                <!-- for each stock in stocks create a new line then we have to insert border after every one-->
+                {% for stock in holdings_sg %}
+                <tr>
+                    <td>{{ stock[0] }}</td>
+                    <td>{{ stock[1] }}</td>
+                    <td>{{ stock[2] }}</td>
+                    <td>{{ stock[3] }}</td>
+                    <td>{{ stock[4] }}</td>
+                    <td>{{ stock[5] }}</td>
+                    <td>{{ stock[6] }}</td>
+                    <!-- DAY CHANGE -->
+                    <td> -- </td>
+                    <!-- % CHANGE -->
+                    {% if stock[7] < 0 %}
+                        <td class="down">{{ stock[7] }}%</td>
+                    {% else %}
+                        <td class="up">{{ stock[7] }}%</td>
+                    {% endif %}
+                    <!-- PROFIT / LOSS -->
+                    {% if stock[8] < 0 %}
+                        <td class="down">{{ stock[8] }}</td>
+                    {% else %}
+                        <td class="up">{{ stock[8] }}</td>
+                    {% endif %}
+                    <td class="stock">{{ stock[9] }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+    </div>
+    <!-- Add/Sell/Edit Individual Shares-->
+    <div class="holdings">
+        <div class="card">
+            <h6>Add Positions / Sell Positions / Edit Positions (Individual Stocks Only)</h6>
+            <span style="opacity: 50%">Use this card to make changes to your positions.</span>
+            <div class="card_pad"></div>
+            <div class="card_bord"></div>
+            <table>
+                <tr style="opacity: 50%">
+                    <th>Action</th>
+                    <th>Market</th>
+                    <th>Ticker Symbol</th>
+                    <th>Sector (for SG)</th>
+                    <th>Date Opened</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <form action="/editpos" method="post">
+                        <div class="form-group">
+                            <td>
+                                <select id="action" name="action" onchange="helper(event)" class="edit">
+                                    <option value="" disabled selected>Add / Sell / Edit</option>
+                                    <option value="add">Add</option>
+                                    <option value="sell">Sell</option>
+                                    <option value="edit">Edit</option>
+                                </select>
+                            </td>
+                            <!-- User has to supply market, instrument(SG), ticker, sector(SG), date_open, qty_bought, price -->
+                            <td>
+                                <select id="currency" name="currency" class="edit" disabled onchange="market(event)">
+                                    <option value="" disabled selected>Market</option>
+                                    <option value="USD">US</option>
+                                    <option value="SGD">SG</option>
+                                </select>
+                            </td>
+<!--                            <td>-->
+<!--                                <input id="instrument" autocomplete="off" name="instrument" placeholder="Instrument Name" type="text" disabled class="edit">-->
+<!--                            </td>-->
+                            <td>
+                                <input id="ticker" autocomplete="off" name="ticker" placeholder="Ticker" type="text" size="6" disabled style="text-transform: uppercase" class="edit">
+                            </td>
+                            <td>
+                                <input id="sector" autocomplete="off" name="sector" placeholder="Sector" type="text" disabled class="edit">
+                            </td>
+                            <td>
+                                <input id="date" autocomplete="off" name="date" type="date" disabled class="edit" style="width: 125px">
+                            </td>
+                            <td>
+                                <input id="qty" autocomplete="off" name="qty" placeholder="Shares" type="number" disabled class="edit" min="1" style="width:170px" onchange="qtyhelp(event)">
+                            </td>
+                            <td>
+                                <input id="price" autocomplete="off" name="price" placeholder="Price" type="number" disabled class="edit" step="0.01">
+                            </td>
+                            <td>
+                                <input type="submit" style="float: right; margin-right: 12px">
+                            </td>
+                            <script>
+                                function market(e) {
+                                    if (e.target.value == "SGD" && document.getElementById("action").value == "add") {
+                                        // document.getElementById("instrument").disabled = false
+                                        // document.getElementById("instrument").required = true
+                                        document.getElementById("sector").disabled = false
+                                        document.getElementById("sector").required = true
+                                    } else {
+                                        // document.getElementById("instrument").disabled = true
+                                        document.getElementById("sector").disabled = true
+                                    }
+                                }
+                                function helper(e) {
+                                    if (e.target.value == "sell") {
+                                        document.getElementById("currency").disabled = false
+                                        document.getElementById("currency").required = true
+                                        // document.getElementById("instrument").disabled = true
+                                        document.getElementById("ticker").disabled = false
+                                        document.getElementById("ticker").required = true
+                                        document.getElementById("sector").disabled = true
+                                        document.getElementById("date").disabled = true
+                                        document.getElementById("qty").disabled = false
+                                        document.getElementById("qty").placeholder = "Shares Sold"
+                                        document.getElementById("qty").min = "1"
+                                        document.getElementById("qty").required = true
+                                        document.getElementById("price").disabled = false
+                                        document.getElementById("price").placeholder = "Price Sold"
+                                        document.getElementById("price").required = true
+
+                                    } else if (e.target.value == "add") {
+                                        if (document.getElementById("currency").value == "SGD") {
+                                            // document.getElementById("instrument").disabled = false
+                                            // document.getElementById("instrument").required = true
+                                            document.getElementById("sector").disabled = false
+                                            document.getElementById("sector").required = true
+                                        }
+                                        document.getElementById("currency").disabled = false
+                                        document.getElementById("currency").required = true
+                                        document.getElementById("ticker").disabled = false
+                                        document.getElementById("ticker").required = true
+                                        document.getElementById("date").disabled = false
+                                        document.getElementById("date").required = true
+                                        document.getElementById("qty").disabled = false
+                                        document.getElementById("qty").placeholder = "Shares Bought"
+                                        document.getElementById("qty").min = "1"
+                                        document.getElementById("qty").required = true
+                                        document.getElementById("price").disabled = false
+                                        document.getElementById("price").placeholder = "Price Bought"
+                                        document.getElementById("price").required = true
+
+                                    } else {
+                                        if (document.getElementById("qty").value == "0") {
+                                            document.getElementById("date").disabled = true
+                                            document.getElementById("price").disabled = true
+                                        } else {
+                                            document.getElementById("date").disabled = false
+                                            document.getElementById("price").disabled = false
+                                        }
+                                        document.getElementById("currency").disabled = false
+                                        document.getElementById("currency").required = true
+                                        // document.getElementById("instrument").disabled = true
+                                        document.getElementById("ticker").disabled = false
+                                        document.getElementById("ticker").required = true
+                                        document.getElementById("sector").disabled = true
+                                        document.getElementById("qty").disabled = false
+                                        document.getElementById("qty").placeholder = "Shares Held (0 to remove)"
+                                        document.getElementById("qty").min = "0"
+                                        document.getElementById("qty").required = true
+                                        document.getElementById("price").placeholder = "Average Price"
+                                    }
+                                }
+                                function qtyhelp(e) {
+                                    if (e.target.value == "0") {
+                                        document.getElementById("date").disabled = true
+                                        document.getElementById("price").disabled = true
+                                    } else {
+                                        if (document.getElementById("action").value == "sell") {
+                                            document.getElementById("date").disabled = true
+                                        } else {
+                                            document.getElementById("date").disabled = false
+                                            document.getElementById("price").disabled = false
+                                        }
+                                    }
+                                }
+                            </script>
+                        </div>
+                    </form>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <!-- Add/Sell/Edit ETF -->
+    <!-- Should be pretty much like Add/Sell/Edit SG Stocks -->
+    <div class="holdings">
+        <div class="card">
+            <h6>Add Positions / Sell Positions / Edit Positions (ETFs Only)</h6>
+            <span style="opacity: 50%">Use this card to make changes to your ETF positions.</span>
+            <div class="card_pad"></div>
+            <div class="card_bord"></div>
+            <table>
+                <tr style="opacity: 50%">
+                    <th>Action</th>
+                    <th>Market</th>
+                    <th>Ticker Symbol</th>
+                    <th>Sector</th>
+                    <th>Date Opened</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <form action="/editetfpos" method="post">
+                        <div class="form-group">
+                            <td>
+                                <select id="etfaction" name="action" onchange="etfhelper(event)" class="edit">
+                                    <option value="" disabled selected>Add / Sell / Edit</option>
+                                    <option value="add">Add</option>
+                                    <option value="sell">Sell</option>
+                                    <option value="edit">Edit</option>
+                                </select>
+                            </td>
+                            <!-- User has to supply market, ETF name, ticker, date_open, qty_bought, price -->
+                            <td>
+                                <select id="etfcurrency" name="currency" class="edit" disabled>
+                                    <option value="" disabled selected>Market</option>
+                                    <option value="USD">US</option>
+                                    <option value="SGD">SG</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input id="etfticker" autocomplete="off" name="ticker" placeholder="Ticker" type="text" size="6" disabled style="text-transform: uppercase" class="edit">
+                            </td>
+                            <td>
+                                <input id="etfsector" autocomplete="off" name="sector" placeholder="ETF" type="text" disabled class="edit">
+                            </td>
+                            <td>
+                                <input id="etfdate" autocomplete="off" name="date" type="date" disabled class="edit" style="width: 125px">
+                            </td>
+                            <td>
+                                <input id="etfqty" autocomplete="off" name="qty" placeholder="Shares" type="number" disabled class="edit" min="1" style="width:170px" onchange="etfqtyhelp(event)">
+                            </td>
+                            <td>
+                                <input id="etfprice" autocomplete="off" name="price" placeholder="Price" type="number" disabled class="edit" min="0.01" step="0.01">
+                            </td>
+                            <td>
+                                <input type="submit" style="float: right; margin-right: 12px">
+                            </td>
+                            <script>
+                                function etfhelper(e) {
+                                    if (e.target.value == "sell") {
+                                        document.getElementById("etfcurrency").disabled = false
+                                        document.getElementById("etfcurrency").required = true
+                                        document.getElementById("etfticker").disabled = false
+                                        document.getElementById("etfticker").required = true
+                                        document.getElementById("etfsector").disabled = true
+                                        document.getElementById("etfdate").disabled = true
+                                        document.getElementById("etfqty").disabled = false
+                                        document.getElementById("etfqty").placeholder = "Shares Sold"
+                                        document.getElementById("etfqty").min = "1"
+                                        document.getElementById("etfqty").required = true
+                                        document.getElementById("etfprice").disabled = false
+                                        document.getElementById("etfprice").placeholder = "Price Sold"
+                                        document.getElementById("etfprice").required = true
+
+                                    } else if (e.target.value == "add") {
+                                        document.getElementById("etfcurrency").disabled = false
+                                        document.getElementById("etfcurrency").required = true
+                                        document.getElementById("etfticker").disabled = false
+                                        document.getElementById("etfticker").required = true
+                                        document.getElementById("etfdate").disabled = false
+                                        document.getElementById("etfdate").required = true
+                                        document.getElementById("etfqty").disabled = false
+                                        document.getElementById("etfqty").placeholder = "Shares Bought"
+                                        document.getElementById("etfqty").min = "1"
+                                        document.getElementById("etfqty").required = true
+                                        document.getElementById("etfprice").disabled = false
+                                        document.getElementById("etfprice").placeholder = "Price Bought"
+                                        document.getElementById("etfprice").required = true
+
+                                    } else {
+                                        if (document.getElementById("etfqty").value == "0") {
+                                            document.getElementById("etfdate").disabled = true
+                                            document.getElementById("etfprice").disabled = true
+                                        } else {
+                                            document.getElementById("etfdate").disabled = false
+                                            document.getElementById("etfprice").disabled = false
+                                        }
+                                        document.getElementById("etfcurrency").disabled = false
+                                        document.getElementById("etfcurrency").required = true
+                                        document.getElementById("etfticker").disabled = false
+                                        document.getElementById("etfticker").required = true
+                                        document.getElementById("etfsector").disabled = true
+                                        document.getElementById("etfqty").disabled = false
+                                        document.getElementById("etfqty").placeholder = "Shares Held (0 to remove)"
+                                        document.getElementById("etfqty").min = "0"
+                                        document.getElementById("etfqty").required = true
+                                        document.getElementById("etfprice").placeholder = "Average Price"
+                                    }
+                                }
+                                function etfqtyhelp(e) {
+                                    if (e.target.value == "0") {
+                                        document.getElementById("etfdate").disabled = true
+                                        document.getElementById("etfprice").disabled = true
+                                    } else {
+                                        document.getElementById("etfprice").disabled = false
+                                        if (document.getElementById("etfaction").value == "sell") {
+                                            document.getElementById("etfdate").disabled = true
+                                        } else {
+                                            document.getElementById("etfdate").disabled = false
+                                        }
+                                    }
+                                }
+                            </script>
+                        </div>
+                    </form>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="holdings">
+        <div class="card">
+            <h6>Deposit / Withdrawal</h6>
+            <p style="opacity: 50%">Use this card to update your cash flow.</p>
+            <div class="card_pad"></div>
+            <div class="card_bord"></div>
+            <div class="card_pad"></div>
+            <table>
+                <tr style="opacity: 50%">
+                    <th>Action</th>
+                    <th>Currency</th>
+                    <th>Amount</th>
+                    <th>Date (Defaults to today if blank)</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <form action="/editcap" method="post">
+                        <div class="form-group">
+                            <td>
+                                <select id="capaction" name="action" onchange="caphelper(event)" class="edit">
+                                    <option value="" disabled selected>Deposit / Withdraw</option>
+                                    <option value="deposit">Deposit</option>
+                                    <option value="withdraw">Withdraw</option>
+                                </select>
+                            </td>
+                            <!-- User has to supply market, instrument(SG), ticker, sector(SG), date_open, qty_bought, price -->
+                            <td>
+                                <select id="capcurrency" name="currency" class="edit" disabled onchange="capcurr(event)">
+                                    <option value="" disabled selected>Currency</option>
+                                    <option value="USD">USD</option>
+                                    <option value="SGD">SGD</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input id="capval" autocomplete="off" name="amount" placeholder="Amount" type="number" min="0.01" step="0.01" class="edit">
+                            </td>
+                            <td>
+                                <input id="capdate" autocomplete="off" name="date" type="date" disabled class="edit" style="width: 125px">
+                            </td>
+                            <td>
+                                <input type="submit" style="float: right; margin-right: 12px">
+                            </td>
+                            <script>
+                                function caphelper(e) {
+                                    if (e.target.value) {
+                                        document.getElementById("capcurrency").disabled = false
+                                        document.getElementById("capcurrency").required = true
+                                        document.getElementById("capval").disabled = false
+                                        document.getElementById("capval").required = true
+                                        document.getElementById("capdate").disabled = false
+                                    }
+                                }
+                            </script>
+                        </div>
+                    </form>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}

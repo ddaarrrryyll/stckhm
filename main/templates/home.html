@@ -1,0 +1,330 @@
+{% extends "sidebar.html" %}
+
+{% block title %}
+    overview
+{% endblock %}
+
+{% block main %}
+<link rel="stylesheet" type="text/css" href="../static/styles/main.css">
+<!-- HEADER COLUMNS FOR ACCOUNT VALUE, CASH, DAY CHANGE -->
+<!-- CHANGE THE VALUES OMG FK -->
+    <div class="row">
+        <div class="column">
+            <div class="card">
+                <h6>Total Value (Holdings + Cash)</h6>
+<!--                yesterday's portfolio + daily returns -->
+                <p style="font-weight: bold">{{ '%0.2f' | format(equity_val+cash) }} USD ≈ {{ '%0.2f' | format((equity_val+cash) * conv_rate)}} SGD</p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="card">
+                <h6>Cash</h6>
+                <p style="font-weight: bold">{{ '%0.2f' | format(cash) }} USD ({{ '%0.2f' | format(cash * conv_rate) }} SGD)</p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="card">
+                <h6>1 Day Return (USD)</h6>
+                {% if day_gains < 0 %}
+                    <p style="font-weight: bold; color: #BB0000">{{ day_gains }} ({{ p_change }}%)</p>
+                {% else %}
+                    <p style="font-weight: bold; color: #00BB00">{{ day_gains }} ({{ p_change }}%)</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+<!-- TWO GRAPHS SHOWING PORTFOLIO VALUE AND % PROFITS -->
+    <div class="row_mid">
+        <div class="column_mid">
+            <div class="card">
+                <script src="https://code.highcharts.com/stock/highstock.js"></script>
+                <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+                <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+
+                <div id="container1" style="height: 400px; min-width: 310px"></div>
+            </div>
+        </div>
+        <div class="column_mid">
+            <div class="card">
+                <script src="https://code.highcharts.com/stock/highstock.js"></script>
+                <script src="https://code.highcharts.com/stock/modules/data.js"></script>
+                <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+                <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+
+                <div id="container2" style="height: 400px; min-width: 310px"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var portfolio = {{ portfolio }}
+        var returns = {{ returns }}
+          // Create the first chart
+          Highcharts.stockChart('container1', {
+              yAxis: {
+                  opposite: false
+                },
+
+              rangeSelector: {
+                  selected: 1
+              },
+
+              title: {
+                  text: 'Portfolio Value (USD)'
+              },
+
+              series: [{
+                  name: 'Portfolio Value',
+                  data: portfolio,
+                  type: 'area',
+                  threshold: null,
+                  tooltip: {
+                      valueDecimals: 2
+                  },
+                  fillColor: {
+                      linearGradient: {
+                          x1: 0,
+                          y1: 0,
+                          x2: 0,
+                          y2: 1
+                      },
+                      stops: [
+                          [0, Highcharts.getOptions().colors[0]],
+                          [1, Highcharts.color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                      ]
+                  }
+              }]
+          });
+        // second chart
+          Highcharts.stockChart('container2', {
+              yAxis: {
+                  opposite: false
+                },
+
+              rangeSelector: {
+                  selected: 1
+              },
+
+              title: {
+                  text: '% Returns'
+              },
+              series: [{
+                  name: '% Returns',
+                  data: returns,
+                  type: 'area',
+                  threshold: 0,
+                  tooltip: {
+                      valueDecimals: 2
+                  },
+                  opacity: 0.7,
+                  negativeColor: '#BB0000',
+                  color: '#00BB00'
+              }]
+          });
+
+    </script>
+<!-- TABLE OF CURRENT HOLDINGS -->
+    <div class="holdings">
+        <div class="card">
+            <h6>Current Positions</h6>
+            <div class="card_pad"></div>
+            <div class="card_bord"></div>
+            <div class="card_pad"></div>
+            <table>
+                <!-- FOR US STOCKS -->
+                {% if holdings_us %}
+                <tr>
+                    <th>Instrument (US)</th>
+                    <th>Ticker</th>
+                    <th>Sector</th>
+                    <th>Date Opened</th>
+                    <th>QTY</th>
+                    <th>Open (USD)</th>
+                    <th>Current Price (USD)</th>
+                    <th>Day Change</th>
+                    <th>% Change</th>
+                    <th>P/L (USD)</th>
+                    <th>Market Value (USD)</th>
+                </tr>
+                <!-- for each stock in stocks create a new line then we have to insert border after every one-->
+                {% for stock in holdings_us %}
+                <tr>
+                    <td>{{ stock[0] }}</td>
+                    <td>{{ stock[1] }}</td>
+                    <td>{{ stock[2] }}</td>
+                    <td>{{ stock[3] }}</td>
+                    <td>{{ stock[4] }}</td>
+                    <td>{{ stock[5] }}</td>
+                    {% if stock[7] == -1 %}
+                        <td>{{ stock[6] }} (Prev. Close)</td>
+                    {% else %}
+                        <td>{{ stock[6] }}</td>
+                    {% endif %}
+                    <!-- DAY CHANGE -->
+                    {% if stock[7] == -1 %}
+                        <td>--</td>
+                    {% else %}
+                        {% if stock[7] < 0 %}
+                            <td class="down">{{ stock[7] }} ({{ stock[8] }}%)</td>
+                        {% else %}
+                            <td class="up">{{ stock[7] }} ({{ stock[8] }}%)</td>
+                        {% endif %}
+                    {% endif %}
+                    <!-- % CHANGE -->
+                    {% if stock[9] < 0 %}
+                        <td class="down">{{ stock[9] }}%</td>
+                    {% else %}
+                        <td class="up">{{ stock[9] }}%</td>
+                    {% endif %}
+                    <!-- PROFIT / LOSS -->
+                    {% if stock[10] < 0 %}
+                        <td class="down">{{ stock[10] }}</td>
+                    {% else %}
+                        <td class="up">{{ stock[10] }}</td>
+                    {% endif %}
+                    <td class="stock">{{ stock[11] }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+                <!-- FOR SG STOCKS -->
+                {% if holdings_sg %}
+                <tr>
+                    <th>Instrument (SG)</th>
+                    <th>Ticker</th>
+                    <th>Sector</th>
+                    <th>Date Opened</th>
+                    <th>QTY</th>
+                    <th>Open (SGD)</th>
+                    <th>Previous Close (SGD)</th>
+                    <th>% Day Change</th>
+                    <th>% Change</th>
+                    <th>P/L (SGD)</th>
+                    <th>Market Value (SGD)</th>
+                </tr>
+                <!-- for each stock in stocks create a new line then we have to insert border after every one-->
+                {% for stock in holdings_sg %}
+                <tr>
+                    <td>{{ stock[0] }}</td>
+                    <td>{{ stock[1] }}</td>
+                    <td>{{ stock[2] }}</td>
+                    <td>{{ stock[3] }}</td>
+                    <td>{{ stock[4] }}</td>
+                    <td>{{ stock[5] }}</td>
+                    <td>{{ stock[6] }}</td>
+                    <!-- DAY CHANGE -->
+                    <td> -- </td>
+                    <!-- % CHANGE -->
+                    {% if stock[7] < 0 %}
+                        <td class="down">{{ stock[7] }}%</td>
+                    {% else %}
+                        <td class="up">{{ stock[7] }}%</td>
+                    {% endif %}
+                    <!-- PROFIT / LOSS -->
+                    {% if stock[8] < 0 %}
+                        <td class="down">{{ stock[8] }}</td>
+                    {% else %}
+                        <td class="up">{{ stock[8] }}</td>
+                    {% endif %}
+                    <td class="stock">{{ stock[9] }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+    </div>
+<!-- DONUT CHART SHOWING DISTRIBUTION OF FUNDS -->
+    <div class="distribution">
+        <div class="column_mid">
+            <div class="card">
+                <script src="http://code.highcharts.com/highcharts.js"></script>
+                <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+                <div id="donut1" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+            </div>
+        </div>
+        <div class="column_mid">
+            <div class="card">
+                <script src="http://code.highcharts.com/highcharts.js"></script>
+                <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+                <div id="donut2" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Create the sector chart
+        var data_sectors = {{ data_sectors|tojson }}
+        var equity_val = {{ equity_val }}
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'donut1',
+                type: 'pie'
+            },
+            title: {
+                text: 'Sectors'
+            },
+            yAxis: {
+                title: {
+                    text: 'Holdings in Sector'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    shadow: false
+                }
+            },
+
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.point.name +'</b>: '+ Math.round(this.y * equity_val).toFixed(2)/100 + ' (' + this.y + '%)';
+                }
+            },
+            // We need to do some calculations and pass in the data value
+            series: [{
+                name: 'Sectors',
+                data: data_sectors,
+                size: '60%',
+                innerSize: '75%',
+                showInLegend: false,
+                dataLabels: {
+                    enabled: true
+                }
+            }]
+        });
+        // Create the currency exposure  chart
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'donut2',
+                type: 'pie'
+            },
+            title: {
+                text: 'Market Exposure'
+            },
+            yAxis: {
+                title: {
+                    text: 'Market Exposure'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    shadow: false
+                }
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.point.name +'</b>: '+ (this.y * 100 / {{equity_val}}).toFixed(2) + '%';
+                }
+            },
+            // We need to do pass in the currencies held by user :D
+            series: [{
+                name: 'Currencies',
+                data: [["USD", {{ usd }}],["SGD",{{ sgd }}]],
+                size: '60%',
+                innerSize: '75%',
+                showInLegend: false,
+                dataLabels: {
+                    enabled: true
+                }
+            }]
+        });
+    </script>
+{% endblock %}

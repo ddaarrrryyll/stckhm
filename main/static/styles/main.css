@@ -1,0 +1,92 @@
+@import "https://fonts.googleapis.com/css?family=Mulish:300,400,500,600,700";
+
+* {
+    box-sizing:border-box;
+}
+
+body {
+    font-family: 'Mulish', sans-serif;
+    font-size: 12px;
+    overflow-x: hidden;
+}
+p {
+    margin: 0px;
+    color: black;
+}
+h6 {
+    margin: 0;
+}
+
+.column {
+    float: left;
+    width: 33%;
+    padding: 0 10px;
+}
+
+.row {
+    margin-left: 17px;
+    margin-right: 19px;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.card {
+    border-radius: 7px;
+    text-align: left;
+    vertical-align: center;
+    background-color: #FFFFFF;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.column_mid {
+    float: left;
+    width: 49%;
+    padding-left: 27px;
+    padding-right: 10px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.column_row {
+    margin: 0 -5px;
+}
+
+.holdings {
+    padding-top: 20px;
+    padding-left: 27px;
+    width: 97.5%;
+}
+
+.card_pad {
+    padding: 3px 0;
+}
+
+.card_bord {
+    border: 1px solid #3D4049;
+    opacity: 8%;
+}
+
+.down {
+    color: #DD0000;
+}
+
+.up {
+    color: #00DD00;
+}
+
+.column4 {
+    float: left;
+    width: 24.8%;
+    padding: 0 10px;
+}
+
+.edit {
+    float: left;
+}
