@@ -74,7 +74,7 @@ loop = asyncio.get_event_loop()
 def update_portfolio():
     # get time now
     now = int(datetime.datetime.now().timestamp()) * 1000
-    c.execute("SELECT timing FROM portfolio WHERE user_id = ? AND timing = (SELECT MAX(timing) FROM portfolio WHERE user_id = ?)", (user_id, user_id))
+    c.execute("SELECT timing FROM portfolio WHERE user_id = ? AND timing = (SELECT MAX(timing) FROM portfolio WHERE user_id = ?)", (user_id, user_id,))
     temp = c.fetchall()
     prev = temp[0][0]
     # get capital
@@ -82,7 +82,7 @@ def update_portfolio():
     temp = c.fetchall()
     capital = sum([_[0] for _ in temp])
     # get cash
-    c.execute("SELECT price FROM stocks WHERE user_id = ? AND currency = ?", (user_id, "cash"))
+    c.execute("SELECT price FROM stocks WHERE user_id = ? AND currency = ?", (user_id, "cash",))
     try:
         cash = c.fetchall()[0][0]
     except IndexError:
@@ -106,13 +106,13 @@ def get_index():
 def get_home():
     g.active_item = 'overview'
     # get cash
-    c.execute("SELECT price FROM stocks WHERE user_id = ? AND currency = ?", (user_id, "cash"))
+    c.execute("SELECT price FROM stocks WHERE user_id = ? AND currency = ?", (user_id, "cash",))
     try:
         cash = c.fetchall()[0][0]
     except IndexError:
         cash = 0
     # porfolio data should update everyday after market closes
-    c.execute("SELECT port_val FROM portfolio WHERE user_id = ? AND timing = (SELECT MAX(timing) FROM portfolio WHERE user_id = ?)", (user_id, user_id))
+    c.execute("SELECT port_val FROM portfolio WHERE user_id = ? AND timing = (SELECT MAX(timing) FROM portfolio WHERE user_id = ?)", (user_id, user_id,))
     temp = c.fetchall()
     try:
         latest_val = temp[0][0]
@@ -144,7 +144,7 @@ def get_detailed():
     c.execute("SELECT instrument, ticker, sector, date_open, qty, price, status, price_sold, currency FROM stocks WHERE user_id = ? ORDER BY date_open", (user_id,))
     temp = c.fetchall()
     # get cash
-    c.execute("SELECT price FROM stocks WHERE user_id = ? AND currency = ?", (user_id, "cash"))
+    c.execute("SELECT price FROM stocks WHERE user_id = ? AND currency = ?", (user_id, "cash",))
     try:
         cash = c.fetchall()[0][0]
     except IndexError:
@@ -232,7 +232,7 @@ def editpos():
                     c.execute("INSERT INTO stocks (user_id, instrument, ticker, sector, date_open, qty, price, status, currency) VALUES (?,?,?,?,?,?,?,?,?) ",
                               (user_id, instrument, ticker, sector, date_open, qty, price, 'hold', currency))
 
-                c.execute("UPDATE stocks SET price = price - ? WHERE user_id = ? and currency = ?", (qty*price, user_id, "cash"))
+                c.execute("UPDATE stocks SET price = price - ? WHERE user_id = ? and currency = ?", (qty*price, user_id, "cash",))
                 conn.commit()
                 flash(f"Added {qty} {ticker} to your portfolio")
                 return redirect("/edit-positions")
@@ -252,7 +252,7 @@ def editpos():
                     # set oldest date
                     date = min(date_open, prev_date)
                     # update the same row with new price, new quantity
-                    c.execute("UPDATE stocks SET date_open = ?, qty = ?, price = ? WHERE user_id = ? AND ticker = ? AND status = 'hold' AND currency = 'SGD'", (date, new_qty, ave_price, user_id, ticker))
+                    c.execute("UPDATE stocks SET date_open = ?, qty = ?, price = ? WHERE user_id = ? AND ticker = ? AND status = 'hold' AND currency = 'SGD'", (date, new_qty, ave_price, user_id, ticker,))
                 # IF NO:
                 elif len(check) == 0:
                     # use investpy to get the instrumment name for SG stocks
@@ -265,9 +265,9 @@ def editpos():
                     curr_price = res.retrieve_information()['prevClose']
                     # Then we insert into stocks user_id, instrument, ticker, sector, date_open, qty, price, "hold", currency
                     c.execute("INSERT INTO stocks (user_id, instrument, ticker, sector, date_open, qty, price, status, currency, currentprice) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                              (user_id, instrument, ticker, sector, date_open, qty, price, "hold", currency, curr_price))
+                              (user_id, instrument, ticker, sector, date_open, qty, price, "hold", currency, curr_price,))
 
-                c.execute("UPDATE stocks SET price = price - ? WHERE user_id = ? and currency = ?", (qty * price/conv_rate, user_id, "cash"))
+                c.execute("UPDATE stocks SET price = price - ? WHERE user_id = ? and currency = ?", (qty * price/conv_rate, user_id, "cash",))
                 conn.commit()
                 flash(f"Added {qty} {ticker} to your portfolio")
                 return redirect("/edit-positions")
@@ -284,10 +284,10 @@ def editpos():
 
                     if currency == "USD":
                         c.execute("UPDATE stocks SET price = price + ? WHERE user_id = ? and currency = ?",
-                                  (qty * price, user_id, "cash"))
+                                  (qty * price, user_id, "cash",))
                     else:
                         c.execute("UPDATE stocks SET price = price + ? WHERE user_id = ? and currency = ?",
-                                  (qty * price / conv_rate, user_id, "cash"))
+                                  (qty * price / conv_rate, user_id, "cash",))
 
                     # IF YES
                     prev_qty = int(prev_qty)
@@ -296,7 +296,7 @@ def editpos():
                         c.execute("UPDATE stocks SET qty = ? WHERE user_id = ? AND ticker = ? AND status = 'hold' AND NOT sector = 'ETF' AND currency = ?", (prev_qty-qty, user_id, ticker, currency,))
                         # insert into db user_id, instrument, ticker, sector, date_opened, qty_sold, price_opened, "sold", price_sold, currency
                         c.execute("INSERT INTO stocks (user_id, instrument, ticker, sector, date_open, qty, price, status, price_sold, currency) VALUES (?,?,?,?,?,?,?,?,?,?) ",
-                                  (user_id, checkinstrument, ticker, checksector, checkdate, qty, ave_price, 'sold', price, currency))
+                                  (user_id, checkinstrument, ticker, checksector, checkdate, qty, ave_price, 'sold', price, currency,))
                         conn.commit()
                         flash(f"Sold {qty} {ticker} from your {currency} portfolio.")
                         return redirect("/edit-positions")
@@ -324,15 +324,15 @@ def editpos():
             # if qty is 0, delete the holding
             if currency and ticker and qty == 0:
                 try:
-                    c.execute("SELECT qty, price, from stocks WHERE user_id = ? AND ticker = ? AND status = 'hold' AND NOT sector = 'ETF' AND currency = ?", (user_id, ticker, currency))
+                    c.execute("SELECT qty, price, from stocks WHERE user_id = ? AND ticker = ? AND status = 'hold' AND NOT sector = 'ETF' AND currency = ?", (user_id, ticker, currency,))
                     q1,p1 = c.fetchall()[0]
                     if currency == "USD":
                         c.execute("UPDATE stocks SET price = price + ? WHERE user_id = ? and currency = ?",
-                                  (q1*p1, user_id, "cash"))
+                                  (q1*p1, user_id, "cash",))
                     else:
                         c.execute("UPDATE stocks SET price = price + ? WHERE user_id = ? and currency = ?",
-                                  (q1*p1 / conv_rate, user_id, "cash"))
-                    c.execute("DELETE FROM stocks WHERE user_id = ? AND ticker = ? AND status = 'hold' AND NOT sector = 'ETF' AND currency = ?", (user_id, ticker, currency))
+                                  (q1*p1 / conv_rate, user_id, "cash",))
+                    c.execute("DELETE FROM stocks WHERE user_id = ? AND ticker = ? AND status = 'hold' AND NOT sector = 'ETF' AND currency = ?", (user_id, ticker, currency,))
                     conn.commit()
                     flash(f"Removed {ticker} from your {currency} portfolio.")
                 except sqlite3.IntegrityError:
@@ -342,7 +342,7 @@ def editpos():
             elif currency and ticker and date_open and price and qty > 0:
                 try:
                     c.execute("UPDATE stocks SET date_open = ?, qty = ?, price = ? WHERE user_id = ? AND ticker = ? AND status = 'hold' AND NOT sector = 'ETF' AND currency = ?",
-                        (date_open, qty, price, user_id, ticker, currency))
+                        (date_open, qty, price, user_id, ticker, currency,))
                     conn.commit()
                     flash(f"Updated {ticker} from your {currency} portfolio.")
                 except sqlite3.IntegrityError:
@@ -397,7 +397,7 @@ def editetfpos():
                     # update the same row with new price, new quantity
                     c.execute(
                         "UPDATE stocks SET date_open = ?, qty = ?, price = ? WHERE user_id = ? AND ticker = ? AND status = 'hold' AND sector = 'ETF' AND currency = 'SGD'",
-                        (date, new_qty, ave_price, user_id, ticker))
+                        (date, new_qty, ave_price, user_id, ticker,))
                 # IF NO:
                 elif len(check) == 0:
                     # use investpy to get etf name
@@ -419,9 +419,9 @@ def editetfpos():
                     # Then we insert into stocks user_id, instrument, ticker, sector, date_open, qty, price, "hold", currency
                     c.execute(
                         "INSERT INTO stocks (user_id, instrument, ticker, sector, date_open, qty, price, status, currency, currentprice) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                        (user_id, instrument, ticker, sector, date_open, qty, price, "hold", currency, curr_price))
+                        (user_id, instrument, ticker, sector, date_open, qty, price, "hold", currency, curr_price,))
 
-                c.execute("UPDATE stocks SET price = price - ? WHERE user_id = ? and currency = ?", (qty * price / conv_rate, user_id, "cash"))
+                c.execute("UPDATE stocks SET price = price - ? WHERE user_id = ? and currency = ?", (qty * price / conv_rate, user_id, "cash",))
                 conn.commit()
                 flash(f"Added {qty} {ticker} to your portfolio")
                 return redirect("/edit-positions")
@@ -447,7 +447,7 @@ def editetfpos():
                         # insert into db user_id, instrument, ticker, sector, date_opened, qty_sold, price_opened, "sold", price_sold, currency
                         c.execute(
                             "INSERT INTO stocks (user_id, instrument, ticker, sector, date_open, qty, price, status, price_sold, currency) VALUES (?,?,?,?,?,?,?,?,?,?) ",
-                            (user_id, checkinstrument, ticker, checksector, checkdate, qty, ave_price, 'sold', price, currency))
+                            (user_id, checkinstrument, ticker, checksector, checkdate, qty, ave_price, 'sold', price, currency,))
                         conn.commit()
                         flash(f"Sold {qty} {ticker} from your {currency} portfolio.")
                         return redirect("/edit-positions")
@@ -457,7 +457,7 @@ def editetfpos():
                             "UPDATE stocks SET status = ?, price_sold = ? WHERE user_id = ? AND ticker = ? AND status = 'hold' AND sector = 'ETF' AND currency = ?",
                             ('sold', price, user_id, ticker, currency,))
                         c.execute("UPDATE stocks SET price = price + ? WHERE user_id = ? and currency = ?",
-                                  (qty * price / conv_rate, user_id, "cash"))
+                                  (qty * price / conv_rate, user_id, "cash",))
                         conn.commit()
                         flash(f"Sold {qty} {ticker} from your {currency} portfolio.")
                         return redirect("/edit-positions")
@@ -471,7 +471,7 @@ def editetfpos():
 
         elif action == "edit":
             c.execute("SELECT * FROM stocks WHERE user_id = ? and ticker = ? AND status = 'hold' AND sector = 'ETF' AND currency = ?",
-                      (user_id, ticker, currency))
+                      (user_id, ticker, currency,))
             check = c.fetchall()
             if len(check) == 0:
                 flash(f"You do not have {ticker} in your {currency} portfolio. Check again.")
@@ -492,7 +492,7 @@ def editetfpos():
                 try:
                     c.execute(
                         "UPDATE stocks SET date_open = ?, qty = ?, price = ? WHERE user_id = ? AND ticker = ? AND status = 'hold' AND sector = 'ETF' AND currency = ?",
-                        (date_open, qty, price, user_id, ticker, currency))
+                        (date_open, qty, price, user_id, ticker, currency,))
                     conn.commit()
                     flash(f"Updated {ticker} from your {currency} portfolio.")
                 except sqlite3.IntegrityError:
@@ -517,7 +517,7 @@ def editcap():
         date = request.form.get("date")
         today = int(datetime.datetime.now().timestamp()) * 1000
         # get the latest portfolio value
-        c.execute("SELECT port_val FROM portfolio WHERE user_id = ? AND timing = (SELECT MAX(timing) FROM portfolio WHERE user_id = ?)", (user_id, user_id))
+        c.execute("SELECT port_val FROM portfolio WHERE user_id = ? AND timing = (SELECT MAX(timing) FROM portfolio WHERE user_id = ?)", (user_id, user_id,))
         temp = c.fetchall()
         try:
             latest_val = temp[0][0]
@@ -543,7 +543,7 @@ def editcap():
                 else:
                     timestamp = int(time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d").timetuple())) * 1000
                 c.execute("INSERT INTO portfolio VALUES (?,?,?,?,?)", (user_id, timestamp, amount, 0, amount,))
-                c.execute("INSERT INTO stocks (user_id, price, currency) VALUES (?,?,?)", (user_id, amount, "cash"))
+                c.execute("INSERT INTO stocks (user_id, price, currency) VALUES (?,?,?)", (user_id, amount, "cash",))
             else:
                 if not date:
                     if latest_val == capital:
@@ -551,16 +551,16 @@ def editcap():
                     else:
                         pctg_change = latest_val * 100 / (capital - amount)
                     c.execute("INSERT INTO portfolio VALUES (?,?,?,?,?)",
-                              (user_id, today, latest_val + amount, pctg_change, amount))
+                              (user_id, today, latest_val + amount, pctg_change, amount,))
                 else:
                     timestamp = int(time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d").timetuple())) * 1000
-                    c.execute("UPDATE portfolio SET port_val = port_val + ?, remarks = ?, WHERE user_id = ? AND timing < ? ORDER BY timing DESC  LIMIT 1", (amount, amount, user_id, timestamp))
-                c.execute("UPDATE stocks SET price = price + ? WHERE user_id = ? AND currency = ?", (amount, user_id, "cash"))
+                    c.execute("UPDATE portfolio SET port_val = port_val + ?, remarks = ?, WHERE user_id = ? AND timing < ? ORDER BY timing DESC  LIMIT 1", (amount, amount, user_id, timestamp,))
+                c.execute("UPDATE stocks SET price = price + ? WHERE user_id = ? AND currency = ?", (amount, user_id, "cash",))
         # if withdrawal, then we just subtract amount from portfolio value from the nearest date / default to today
         elif action == 'withdraw':
             # user hasn't deposited before
             if len(check) == 0 or check[0][2] < amount:
-                flash(f"You do not have enough assets to withdraw {amount}USD ({round(amount * conv_rate,2)}SGD)")
+                flash(f"You do not have enough cash to withdraw {amount}USD ({round(amount * conv_rate,2)}SGD)")
                 return redirect("/edit-positions")
             else:
                 if not date:
@@ -568,11 +568,11 @@ def editcap():
                         pctg_change = 0
                     else:
                         pctg_change = latest_val*100/(capital - amount)
-                    c.execute("INSERT INTO portfolio VALUES (?,?,?,?,?)", (user_id, today, latest_val-amount, pctg_change, -amount))
+                    c.execute("INSERT INTO portfolio VALUES (?,?,?,?,?)", (user_id, today, latest_val-amount, pctg_change, -amount,))
                 else:
                     timestamp = int(time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d").timetuple())) * 1000
-                    c.execute("UPDATE portfolio SET port_val = port_val - ?, remarks = ? WHERE user_id = ? AND timing < ? ORDER BY timing DESC LIMIT 1", (amount, -amount, user_id, timestamp))
-                c.execute("UPDATE stocks SET price = price - ? WHERE user_id = ? AND currency = ?", (amount, user_id, "cash"))
+                    c.execute("UPDATE portfolio SET port_val = port_val - ?, remarks = ? WHERE user_id = ? AND timing < ? ORDER BY timing DESC LIMIT 1", (amount, -amount, user_id, timestamp,))
+                c.execute("UPDATE stocks SET price = price - ? WHERE user_id = ? AND currency = ?", (amount, user_id, "cash",))
         conn.commit()
         flash(f"'{action} {amount}USD ({round(amount * conv_rate,2)} SGD)' has been recorded in your portfolio.")
         return redirect("/edit-positions")
