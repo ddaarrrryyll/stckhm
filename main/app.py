@@ -15,13 +15,11 @@ from tempfile import mkdtemp
 
 # USD to SGD conversion rate
 er_token = os.getenv("exchange_rate_token") # From https://app.exchangerate-api.com/
-# er_token = keys.exchangeRate_token
 temp = requests.get(f"https://v6.exchangerate-api.com/v6/{er_token}/latest/USD")
 res = temp.json()
 conv_rate = float(res['conversion_rates']['SGD'])
 
 token = os.getenv("finnhub_api_key") # From https://finnhub.io/
-# token = keys.finnhub_token
 
 user_id = "demo" # Choose how you want the database to identify you // I don't think you need to have more than one user
 
