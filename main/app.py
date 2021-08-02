@@ -49,6 +49,7 @@ def after_request(response):
 
 # configure database
 db = os.getenv("DATABASE_URL")
+print(type(db), db, sep="\n")
 conn = sqlite3.connect(db, timeout=5.0, check_same_thread=False)
 c = conn.cursor()
 conn.row_factory = sqlite3.Row
