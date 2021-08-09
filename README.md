@@ -7,7 +7,7 @@ With that said, I have decided to not live host this webapp because I feel that 
 
 ## Before Doing anything
 ### Download all the files
-Clone repository and download all the files :D
+Download files as zip then extract
 ### Install requirements
 Do `pip install requirements.txt` in your python terminal/console
 ### Getting the API keys
