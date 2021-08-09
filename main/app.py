@@ -160,7 +160,7 @@ def get_detailed():
     # get capital
     c.execute("SELECT remarks from portfolio WHERE user_id = ?", (user_id,))
     temp = c.fetchall()
-    capital = sum([_[0] for _ in temp])
+    capital = sum([_[0] for _ in temp if _[0]])
     # THIS IS TEMPORARY (I THINK)
     if capital == 0:
         earnings = 0
