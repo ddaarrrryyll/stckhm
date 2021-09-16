@@ -8,6 +8,8 @@ With that said, I have decided to not live host this webapp because I feel that 
 ## Before Doing anything
 ### Download all the files
 Download files as zip then extract
+### Or you can git clone if you prefer
+Do `git clone https://github.com/ddaarrrryyll/stckhm` in your python terminal/console
 ### Install requirements
 Do `pip install requirements.txt` in your python terminal/console
 ### Getting the API keys
