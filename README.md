@@ -5,6 +5,15 @@ StckHm is a portfolio tracking web application that I built during the summer of
 StckHm uses a combination of graphs and charts to help you visualise your portfolio growth throughout your investing journey and the best part is, you do not have to update the prices of your holdings manually! :D Prices of US stocks are updated using Finnhub's API while closing prices of Singapore Stocks and all ETFs are updated using investpy (since SGX's API is only available for clearing partners >:( )\
 With that said, I have decided to not live host this webapp because I feel that I do not have any rights to see what your holdings are since some may consider it as 'private'. Instead, I will be providing a guide on how to run this webapp on your pc (hopefully it's not hard HAHA)
 
+## Screenshots
+### Main/Home page
+![image](https://user-images.githubusercontent.com/51407026/133651633-06e0a88d-62a3-4a4e-a0e3-86c9c7691c2f.png)
+### Performance page (keeps track of all your previous plays)
+![image](https://user-images.githubusercontent.com/51407026/133651747-543b537f-da80-41fc-8515-4d958beeb2cb.png)
+### Edit Positions page (page that allows you to edit your positions)
+![image](https://user-images.githubusercontent.com/51407026/133651836-0f932013-2ed2-4789-8d11-52f81828b3c6.png)
+
+
 ## Before Doing anything
 ### Download all the files
 Download files as zip then extract
