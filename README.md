@@ -8,7 +8,7 @@ With that said, I have decided to not live host this webapp because I feel that 
 ## Screenshots
 ### Main/Home page
 ![image](https://user-images.githubusercontent.com/51407026/133651633-06e0a88d-62a3-4a4e-a0e3-86c9c7691c2f.png)
-### Performance page (keeps track of all your previous plays)
+### Performance page (keeps track of all your current and previous plays)
 ![image](https://user-images.githubusercontent.com/51407026/133651747-543b537f-da80-41fc-8515-4d958beeb2cb.png)
 ### Edit Positions page (page that allows you to edit your positions)
 ![image](https://user-images.githubusercontent.com/51407026/133651836-0f932013-2ed2-4789-8d11-52f81828b3c6.png)
