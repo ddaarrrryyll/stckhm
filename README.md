@@ -28,7 +28,7 @@ Replace `user_id = "demo"` with `user_id = "ANY_USERNAME_YOU_WANT"` where `ANY_U
 Replace `er_token = os.getenv("exchange_rate_token")` with `er_token = YOUR_TOKEN_FROM_EXCHANGERATE_API` where `YOUR_TOKEN_FROM_EXCHANGERATE_API` is your token from exchangerate-api\
 Replace `token = os.getenv("finnhub_api_key")` with `token = YOUR_API_TOKEN_FROM_FINNHUB` where `YOUR_API_TOKEN_FROM_FINNHUB` is your token from Finnhub\
 You can test to see if the application works by right-clicking anywhere in the text editor and selecting "run app.py" or typing `flask run` (I think) in your python console/terminal
-## Setting up the web app
+## Setting up internally
 First add your capital (ie the amount you have put into your portfolio in cash) using the "Deposit/Withdraw" card under "Edit Positions", then proceed to add your holdings using "Add/Sell/Edit Positions" card on the same page. Please try to add your holdings accurately so minimal edits are required and calculations can be done more accurately.\
 Afterwards you can click around to familiarise yourself with the webapp and I hope you will enjoy using it as much as I do.
 
